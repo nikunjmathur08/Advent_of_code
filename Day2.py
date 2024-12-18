@@ -1,17 +1,6 @@
 import sys
 
 def is_safe_report(report):
-    """
-    Check if a report is safe according to the Red-Nosed reactor safety rules:
-    1. Levels must be either all increasing or all decreasing
-    2. Adjacent levels can only differ by 1-3
-    
-    Args:
-        report (list): A list of integers representing levels in a report
-    
-    Returns:
-        bool: True if the report is safe, False otherwise
-    """
     # Check if levels are increasing
     def is_increasing(lst):
         return all(lst[i+1] - lst[i] >= 1 and lst[i+1] - lst[i] <= 3 for i in range(len(lst) - 1))
@@ -28,16 +17,12 @@ def is_safe_report(report):
     return is_increasing(report) or is_decreasing(report)
 
 def analyze_reactor_reports(reports):
-    """
-    Analyze a list of reports and count how many are safe
+    safe_reports = []
+    for report in reports:
+        # Check if report is safe directly or with Problem Dampener
+        if is_safe_report(report) or apply_problem_dampener(report):
+            safe_reports.append(report)
     
-    Args:
-        reports (list): A list of reports, where each report is a list of integers
-    
-    Returns:
-        dict: Dictionary containing analysis results
-    """
-    safe_reports = [report for report in reports if is_safe_report(report)]
     return {
         'total_reports': len(reports),
         'safe_reports': len(safe_reports),
@@ -45,15 +30,6 @@ def analyze_reactor_reports(reports):
     }
 
 def parse_input_file(filename):
-    """
-    Parse input file into reports
-    
-    Args:
-        filename (str): Path to the input file
-    
-    Returns:
-        list: List of reports
-    """
     try:
         with open(filename, 'r') as file:
             reports = []
@@ -69,7 +45,37 @@ def parse_input_file(filename):
         print(f"Error: Invalid input in file '{filename}'. Ensure all entries are integers.")
         sys.exit(1)
 
+def apply_problem_dampener(report):
+    # Try removing each level and check if the resulting report is safe
+    for i in range(len(report)):
+        # Create a new report without the i-th level
+        dampened_report = report[:i] + report[i+1:]
+        
+        # Check if the dampened report is safe
+        if is_safe_report(dampened_report):
+            return True
+    
+    return False
+
+def parse_input_file(filename):
+    try:
+        with open(filename, 'r') as file:
+            reports = []
+            for line in file:
+                # Convert line to list of integers
+                report = [int(x) for x in line.strip().split()]
+                reports.append(report)
+        return reports
+    except FileNotFoundError:
+        print(f"Error: File '{filename}' not found.")
+        exit(1)
+    except ValueError:
+        print("Error: Invalid input in file. Ensure all entries are integers.")
+        exit(1)
+
 def main():
+    import sys
+    
     # Check if filename is provided
     if len(sys.argv) != 2:
         print("Usage: python script.py <input_file>")
