@@ -3,7 +3,7 @@ from itertools import product
 from functools import cache
 
 p1, p2 = 0, 0
-for row in open('/Users/nikunjmathur/Developer/FuckAround/AdventOfCode/2025/day10.txt').read().splitlines():
+for row in open('day10.txt').read().splitlines():
     dia, *buttons, jolts = row.split()
     dia = tuple(1 if c == '#' else 0 for c in dia[1:-1])
     buttons = [tuple(map(int,x[1:-1].split(','))) for x in buttons]
